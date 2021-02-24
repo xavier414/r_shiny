@@ -13,35 +13,26 @@ library(shiny)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("This is a new Shiny app"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
+    titlePanel("Another title"),
+    includeMarkdown("references.md"),
+    h3("Plots"),
+    plotOutput(outputId = "plot")
 )
 
+data = runif(20)
 # Define server logic required to draw a histogram
+library(ggplot2)
 server <- function(input, output) {
+    output$plot <-  renderPlot({
+        ggplot(msleep, aes(bodywt, sleep_total, colour = vore)) +
+            scale_x_log10() +
+            geom_point() + facet_wrap(~ vore, nrow = 2)
+    })
+}
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+server <- function(input, output) {
+    output$plot <-  renderPlot({
+        plot(data)
     })
 }
 
